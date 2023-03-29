@@ -20,8 +20,7 @@ const Alert = ({ children, onClose }: Props) => {
 
 export default Alert;
 
-// Alert
-
+// ALERT
 // function App() {
 //     return (
 //       <Alert>
@@ -30,7 +29,7 @@ export default Alert;
 //     );
 //   }
 
-// Alert on Click Button and Close
+// ALERT on Click Button and Close
 // function App() {
 //   const [alertVisable, setAlertVisibility] = useState(false);
 //   return (

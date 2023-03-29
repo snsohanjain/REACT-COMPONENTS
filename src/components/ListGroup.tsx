@@ -37,6 +37,7 @@ function ListGroup({ items, heading, onSelectItem }: Props) {
 }
 export default ListGroup;
 
+//LIST OF ITEMS
 // function App() {
 //   let items = ["India", "New York", "Tokey", "London", "Paris"];
 

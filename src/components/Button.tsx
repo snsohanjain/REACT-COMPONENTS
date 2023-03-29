@@ -13,7 +13,7 @@ const Button = ({ children, onClick, color = "primary" }: Props) => {
 };
 export default Button;
 
-//Button
+//BUTTON
 // function App() {
 //     return (
 //       <div>
