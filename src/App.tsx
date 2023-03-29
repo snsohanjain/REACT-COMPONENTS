@@ -5,6 +5,10 @@ import { useEffect, useState } from "react";
 interface User {
   id: number;
   name: string;
+  username: string;
+  email: string;
+  phone: number;
+  website: string;
 }
 
 function App() {
@@ -20,11 +24,28 @@ function App() {
   return (
     <>
       {error && <p className="text-danger">{error}</p>}
-      <ul>
-        {users.map((user) => (
-          <li key={user.id}>{user.name}</li>
-        ))}
-      </ul>
+      <table className="table table-bordered">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Website</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((user) => (
+            <tr key={user.id}>
+              <td>{user.username}</td>
+              <td>{user.name}</td>
+              <td>{user.email}</td>
+              <td>{user.phone}</td>
+              <td>{user.website}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </>
   );
 }
