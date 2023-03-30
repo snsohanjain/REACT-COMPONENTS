@@ -1,6 +1,6 @@
-import axios from "axios";
 import "bootstrap/dist/css/bootstrap.css";
 import { useEffect, useState } from "react";
+import apiClient, { CanceledError } from "./services/api-client";
 
 interface User {
   id: number;
@@ -14,17 +14,74 @@ interface User {
 function App() {
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState("");
+  const [isLoading, setLoading] = useState(true);
+
   useEffect(() => {
-    axios
-      .get<User[]>("https://jsonplaceholder.typicode.com/users")
-      .then((res) => setUsers(res.data))
-      .catch((err) => setError(err.message));
+    const controller = new AbortController();
+    setLoading(true);
+    apiClient
+      .get<User[]>("/users", {
+        signal: controller.signal,
+      })
+      .then((res) => {
+        setUsers(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        if (err instanceof CanceledError) return;
+        setError(err.message);
+        setLoading(false);
+      });
+
+    return () => controller.abort();
   }, []);
+
+  const deleteUser = (user: User) => {
+    const originalUsers = [...users];
+    setUsers(users.filter((u) => u.id !== user.id));
+    apiClient.delete("/users/" + user.id).catch((err) => {
+      setError(err.message);
+      setUsers(originalUsers);
+    });
+  };
+  const addUser = () => {
+    const originalUsers = [...users];
+    const newUser = {
+      id: 0,
+      username: "sohan",
+      name: "SOHANJAIN",
+      email: "snsohanjain@gmail.com",
+      phone: 8880638514,
+      website: "sohanjain.cloud",
+    };
+    setUsers([newUser, ...users]);
+    apiClient
+      .post("/users/", newUser)
+      .then(({ data: savedUser }) => setUsers([savedUser, ...users]))
+      .catch((err) => {
+        setError(err.message);
+        setUsers(originalUsers);
+      });
+  };
+  const updateUser = (user: User) => {
+    const originalUsers = [...users];
+    const updatedUser = { ...user, name: user.name + "!" };
+    setUsers(users.map((u) => (u.id === user.id ? updatedUser : u)));
+    apiClient.patch("/users/" + user.id, updatedUser).catch((err) => {
+      setError(err.message);
+      setUsers(originalUsers);
+    });
+  };
 
   return (
     <>
+      <h1>Dashboard</h1>
       {error && <p className="text-danger">{error}</p>}
-      <table className="table table-bordered">
+      {isLoading && <div className="spinner-border"></div>}
+      <button className="btn btn-primary mb3" onClick={addUser}>
+        Add
+      </button>
+      <table className="table  table-striped">
         <thead>
           <tr>
             <th>Username</th>
@@ -42,6 +99,23 @@ function App() {
               <td>{user.email}</td>
               <td>{user.phone}</td>
               <td>{user.website}</td>
+              <td>
+                <button
+                  className="btn btn-outline-secondary"
+                  onClick={() => updateUser(user)}
+                >
+                  Update
+                </button>
+              </td>
+              <td>
+                <button
+                  className="btn btn-outline-danger"
+                  type="submit"
+                  onClick={() => deleteUser(user)}
+                >
+                  Delete
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
