@@ -1,5 +1,6 @@
-import create from "./http-service";
 import apiClient from "./api-client";
+import create from "./http-service";
+
 
 export interface User {
     id: number;
@@ -10,6 +11,7 @@ export interface User {
     website: string;
 }
 class UserService{
+
     getAllUsers(){
         const controller = new AbortController();
         return apiClient.get<User[]>("/users", { 

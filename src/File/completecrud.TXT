@@ -1,6 +1,15 @@
 import "bootstrap/dist/css/bootstrap.css";
 import useUsers from "./hooks/useUser";
-import userService, { User } from "./services/user-service";
+import apiClient, { CanceledError } from "./services/api-client";
+
+interface User {
+  id: number;
+  name: string;
+  username: string;
+  email: string;
+  phone: number;
+  website: string;
+}
 
 function App() {
   const { users, error, isLoading, setUsers, setError } = useUsers();
@@ -8,13 +17,11 @@ function App() {
   const deleteUser = (user: User) => {
     const originalUsers = [...users];
     setUsers(users.filter((u) => u.id !== user.id));
-
-    userService.delete(user.id).catch((err) => {
+    apiClient.delete("/users/" + user.id).catch((err) => {
       setError(err.message);
       setUsers(originalUsers);
     });
   };
-
   const addUser = () => {
     const originalUsers = [...users];
     const newUser = {
@@ -26,9 +33,8 @@ function App() {
       website: "sohanjain.cloud",
     };
     setUsers([newUser, ...users]);
-
-    userService
-      .create(newUser)
+    apiClient
+      .post("/users/", newUser)
       .then(({ data: savedUser }) => setUsers([savedUser, ...users]))
       .catch((err) => {
         setError(err.message);
@@ -39,8 +45,7 @@ function App() {
     const originalUsers = [...users];
     const updatedUser = { ...user, name: user.name + "!" };
     setUsers(users.map((u) => (u.id === user.id ? updatedUser : u)));
-
-    userService.update(updatedUser).catch((err) => {
+    apiClient.patch("/users/" + user.id, updatedUser).catch((err) => {
       setError(err.message);
       setUsers(originalUsers);
     });
